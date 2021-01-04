@@ -1,7 +1,51 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import React, { useRef, useState } from "react";
+import Head from "next/head";
+import axios from "axios";
+import styles from "../styles/Home.module.css";
+import {
+  Input,
+  InputGroup,
+  InputRightElement,
+  Button,
+  FormErrorMessage,
+  FormLabel,
+  FormControl,
+} from "@chakra-ui/react";
+import { useForm } from "react-hook-form";
 
-export default function Home() {
+function Home() {
+  const [show, setShow] = useState(false);
+  const { handleSubmit, errors, register, formState, watch } = useForm();
+  const password = useRef({});
+  password.current = watch("password", "");
+  const handleClick = () => setShow(!show);
+
+  function validateName(value) {
+    if (!value) {
+      return "Name is required";
+    } else return true;
+  }
+
+  function validateEmail(value) {
+    if (!value) {
+      return "Email is required";
+    }
+  }
+
+  async function onSubmit(values) {
+    const signupData = {
+      name: values.name,
+      email: values.email,
+      password: values.password,
+    };
+    await axios
+      .post("http://localhost:5000/api/auth/signup", {
+        body: JSON.stringify(signupData),
+      })
+      .then((res) => console.log(res))
+      .catch((err) => console.log(err));
+  }
+
   return (
     <div className={styles.container}>
       <Head>
@@ -10,56 +54,104 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+        <h3>Welcome boss!</h3>
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
+        <div className={styles.card}>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <FormControl isInvalid={errors.name} isRequired id="name">
+              {/*<FormLabel htmlFor="name">İsim</FormLabel>*/}
+              <Input
+                name="name"
+                placeholder="İsim"
+                ref={register({ validate: validateName })}
+              />
+              <FormErrorMessage>
+                {errors.name && errors.name.message}
+              </FormErrorMessage>
+            </FormControl>
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
+            <FormControl isInvalid={errors.email} isRequired id="email" mt={2}>
+              {/*<FormLabel htmlFor="email">E-mail</FormLabel>*/}
+              <Input
+                name="email"
+                placeholder="E-mail"
+                ref={register({
+                  validate: validateEmail,
+                  pattern: /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/,
+                })}
+              />
+              <FormErrorMessage>
+                {errors.email && "Mail is required"}
+              </FormErrorMessage>
+            </FormControl>
 
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
+            <FormControl
+              isInvalid={errors.password}
+              isRequired
+              id="password"
+              mt={2}
+            >
+              {/*<FormLabel htmlFor="password">Şifre</FormLabel>*/}
+              <Input
+                name="password"
+                type="password"
+                placeholder="Şifre"
+                ref={register({
+                  required: "You must specify a password",
+                  minLength: {
+                    value: 8,
+                    message: "Password must have at least 8 characters",
+                  },
+                })}
+              />
+              <FormErrorMessage>
+                {errors.password && <p>{errors.password.message}</p>}
+              </FormErrorMessage>
+            </FormControl>
 
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
+            <FormControl
+              isInvalid={errors.password}
+              isRequired
+              id="password_repeat"
+              mt={2}
+            >
+              {/*<FormLabel htmlFor="password">Şifre</FormLabel>*/}
+              <Input
+                name="password_repeat"
+                type="password"
+                ref={register({
+                  validate: (value) =>
+                    value === password.current || "The passwords do not match",
+                })}
+              />
+              {errors.password_repeat && (
+                <p>{errors.password_repeat.message}</p>
+              )}
 
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
+              <FormErrorMessage>
+                {errors.password_repeat && "The passwords do not match"}
+              </FormErrorMessage>
+            </FormControl>
+
+            <Button
+              mt={4}
+              colorScheme="teal"
+              isLoading={formState.isSubmitting}
+              type="submit"
+            >
+              Submit
+            </Button>
+          </form>
+
+          <a href="#">
+            <h3>Sign In &rarr;</h3>
           </a>
         </div>
       </main>
 
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
+      <footer className={styles.footer}>Powered by ?</footer>
     </div>
-  )
+  );
 }
+
+export default Home;
