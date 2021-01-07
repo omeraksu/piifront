@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import { Container, Box } from "@chakra-ui/react";
 import { publicFetch } from "../utils/util";
 import { useForm } from "react-hook-form";
+import { env } from "../next.config";
 
 function SignUp({ children }) {
   const { register, handleSubmit } = useForm();
 
   const onSubmit = async (data, e) => {
-    await fetch("http://localhost:5000/api/auth/signup", {
+    await fetch(`${env.API_URL}/auth/signup`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -21,6 +22,8 @@ function SignUp({ children }) {
       .catch((error) => {
         console.error("Error:", error);
       });
+
+    //clear input
     e.target.reset();
   };
 
