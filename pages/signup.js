@@ -1,14 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import { Container, Box } from "@chakra-ui/react";
-import { publicFetch } from "../utils/util";
 import { useForm } from "react-hook-form";
-import { env } from "../next.config";
 
 function SignUp({ children }) {
   const { register, handleSubmit } = useForm();
 
   const onSubmit = async (data, e) => {
-    await fetch(`${env.API_URL}/auth/signup`, {
+    await fetch(`${process.env.API_URL}/auth/signup`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
