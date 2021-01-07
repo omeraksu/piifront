@@ -1,32 +1,57 @@
-import React from "react";
-
-import {
-  VStack,
-  Input,
-  Container,
-  Heading,
-  Button,
-  Flex,
-} from "@chakra-ui/react";
-import Link from "next/link";
+import React, { useState } from "react";
+import { Container, Box } from "@chakra-ui/react";
+import { publicFetch } from "../utils/util";
+import { useForm } from "react-hook-form";
 
 function SignUp({ children }) {
+  const { register, handleSubmit } = useForm();
+
+  const onSubmit = async (data, e) => {
+    await fetch("http://localhost:5000/api/auth/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+    e.target.reset();
+  };
+
   return (
-    <Container maxW="xl" centerContent align>
-      <VStack mt={32} align="start">
-        <Heading mb={4}>Sign Up</Heading>
-        <Input variant="filled" placeholder="name" />
-        <Input variant="filled" placeholder="surname" />
-        <Input variant="filled" placeholder="email" />
-        <Input variant="filled" placeholder="password" />
-        <Input variant="filled" placeholder="password_validate" />
-        <Flex justify="space-between" w="100%">
-          <Button colorScheme="pink">Submit</Button>
-          <Button colorScheme="pink" variant="outline">
-            <Link href="/">Home</Link>
-          </Button>
-        </Flex>
-      </VStack>
+    <Container maxW="xl" centerContent>
+      <Box>
+        <form onSubmit={handleSubmit(onSubmit)} method="POST" noValidate>
+          <input
+            name="name"
+            type="text"
+            placeholder="Name"
+            ref={register({ required: true })}
+          />
+          <input
+            name="email"
+            type="text"
+            placeholder="email"
+            ref={register({
+              required: true,
+              pattern: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+            })}
+          />
+          <input
+            name="password"
+            type="password"
+            placeholder="Password"
+            ref={register({ required: true })}
+          />
+          <button type="submit">Sign Up</button>
+        </form>
+      </Box>
     </Container>
   );
 }

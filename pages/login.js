@@ -21,9 +21,11 @@ function Login({ children }) {
         <Input variant="filled" placeholder="password" />
         <Flex w="100%" justify="space-between">
           <Button colorScheme="pink">Submit</Button>
-          <Button colorScheme="pink" variant="outline">
-            <Link href="/">Home</Link>
-          </Button>
+          <Link href="/">
+            <Button colorScheme="pink" variant="outline">
+              Home
+            </Button>
+          </Link>
         </Flex>
       </VStack>
     </Container>
