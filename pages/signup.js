@@ -6,7 +6,7 @@ function SignUp({ children }) {
   const { register, handleSubmit } = useForm();
 
   const onSubmit = async (data, e) => {
-    await fetch(`${process.env.API_URL}/auth/signup`, {
+    await fetch("https://piiapi.herokuapp.com/api/auth/signup", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
