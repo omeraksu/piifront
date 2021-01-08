@@ -1,60 +1,68 @@
-import React from "react";
-import { Container, Box } from "@chakra-ui/react";
-import { useForm } from "react-hook-form";
+import React, { useState } from 'react'
+import { Container, Button, Input, Heading, VStack } from '@chakra-ui/react'
+import { useForm } from 'react-hook-form'
 
 function SignUp({ children }) {
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit } = useForm()
+  const [loading, setLoading] = useState(false)
 
   const onSubmit = async (data, e) => {
-    await fetch("https://piiapi.herokuapp.com/api/auth/signup", {
-      method: "POST",
+    setLoading(true)
+    await fetch('https://piiapi.herokuapp.com/api/auth/signup', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(data)
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log("Success:", data);
+        console.log('Success:', data)
       })
       .catch((error) => {
-        console.error("Error:", error);
-      });
+        console.error('Error:', error)
+      })
 
     //clear input
-    e.target.reset();
-  };
+    e.target.reset()
+    setLoading(false)
+  }
 
   return (
     <Container maxW="xl" centerContent>
-      <Box>
+      <VStack mt={32} spacing={4} align="start">
+        <Heading>Sign Up</Heading>
         <form onSubmit={handleSubmit(onSubmit)} method="POST" noValidate>
-          <input
-            name="name"
-            type="text"
-            placeholder="Name"
-            ref={register({ required: true })}
-          />
-          <input
-            name="email"
-            type="text"
-            placeholder="email"
-            ref={register({
-              required: true,
-              pattern: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-            })}
-          />
-          <input
-            name="password"
-            type="password"
-            placeholder="Password"
-            ref={register({ required: true })}
-          />
-          <button type="submit">Sign Up</button>
+          <VStack spacing={4} align="start">
+            <Input
+              name="name"
+              type="text"
+              placeholder="Name"
+              ref={register({ required: true })}
+            />
+            <Input
+              name="email"
+              type="text"
+              placeholder="email"
+              ref={register({
+                required: true,
+                pattern: /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/
+              })}
+            />
+            <Input
+              name="password"
+              type="password"
+              placeholder="Password"
+              ref={register({ required: true })}
+            />
+            <Button isLoading={loading} loadingText="..." type="submit">
+              Sign Up
+            </Button>
+          </VStack>
         </form>
-      </Box>
+      </VStack>
     </Container>
-  );
+  )
 }
 
-export default SignUp;
+export default SignUp
